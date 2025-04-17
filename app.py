@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, g, request, jsonify
+from flask import Flask, g, request, jsonify, send_file
 from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
@@ -47,8 +47,7 @@ def create_user():
     db, cursor = get_db()
     cursor.execute(
         "INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING *",
-        (username, email, password),
-    )
+        (username, email, password))
     new_created_user = cursor.fetchone()
     db.commit()
 
@@ -98,6 +97,11 @@ def get_user(id):
     if user is None:
         return jsonify({"message": "Usuario no encontrado"}), 404
     return jsonify(serialize_row(user)), 200
+
+
+@app.get('/')
+def home():
+    return send_file('static/index.html')
 
 
 if __name__ == "__main__":
